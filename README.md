@@ -1,1 +1,1 @@
-# llm-p
+# FastAPI LLM service with JWT auth
