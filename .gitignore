@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Дополнительно для проекта llm-p
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.local
+uv.lock
+app.db
