@@ -46,3 +46,32 @@ async def clear_history(
 ):
     """Очистка истории диалога"""
     await chat_usecase.clear_history(user_id)
+
+@router.post("/diagnostic")
+async def diagnostic(
+    user_id: int = Depends(get_current_user_id),
+):
+    import httpx
+    from app.core.config import settings
+    
+    headers = {
+        "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    
+    payload = {
+        "model": settings.OPENROUTER_MODEL,
+        "messages": [{"role": "user", "content": "Hi"}],
+    }
+    
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.post(
+            f"{settings.OPENROUTER_BASE_URL}/chat/completions",
+            headers=headers,
+            json=payload,
+        )
+        return {
+            "status": response.status_code,
+            "headers": dict(response.headers),
+            "text": response.text[:500],
+        }
