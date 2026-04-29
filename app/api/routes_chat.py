@@ -13,20 +13,30 @@ router = APIRouter()
 async def chat(
     request: ChatRequest,
     user_id: int = Depends(get_current_user_id),
-    chat_usecase: ChatUseCase = Depends(get_chat_usecase),
+    # chat_usecase: ChatUseCase = Depends(get_chat_usecase),  # временно закомментировать
 ):
-    """Отправка запроса к LLM"""
-    try:
-        answer = await chat_usecase.ask(
-            user_id=user_id,
-            prompt=request.prompt,
-            system=request.system,
-            max_history=request.max_history,
-            temperature=request.temperature,
+    """Отправка запроса к LLM (упрощённая версия)"""
+    import httpx
+    from app.core.config import settings
+    
+    headers = {
+        "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    
+    payload = {
+        "model": settings.OPENROUTER_MODEL,
+        "messages": [{"role": "user", "content": request.prompt}],
+    }
+    
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        response = await client.post(
+            f"{settings.OPENROUTER_BASE_URL}/chat/completions",
+            headers=headers,
+            json=payload,
         )
-        return ChatResponse(answer=answer)
-    except ExternalServiceError as e:
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e))
+        data = response.json()
+        return ChatResponse(answer=data["choices"][0]["message"]["content"])
 
 
 @router.get("/history", response_model=list[MessageResponse])
