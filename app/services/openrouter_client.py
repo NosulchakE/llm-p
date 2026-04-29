@@ -14,6 +14,11 @@ class OpenRouterClient:
     
     async def chat_completion(self, messages: List[Dict[str, str]]) -> str:
         """Отправка запроса к OpenRouter"""
+        
+        # Проверка наличия API ключа
+        if not self.api_key or self.api_key == "your_openrouter_api_key_here":
+            raise ExternalServiceError("OpenRouter API key is not configured")
+        
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "HTTP-Referer": settings.OPENROUTER_SITE_URL,
@@ -32,15 +37,22 @@ class OpenRouterClient:
                     f"{self.base_url}/chat/completions",
                     headers=headers,
                     json=payload,
+                    follow_redirects=True,  # ✅ важно для обработки 307
                 )
                 
-                if response.status_code != 200:
+                if response.status_code == 401:
+                    raise ExternalServiceError("OpenRouter: Invalid API key")
+                elif response.status_code == 429:
+                    raise ExternalServiceError("OpenRouter: Rate limit exceeded")
+                elif response.status_code != 200:
                     raise ExternalServiceError(f"OpenRouter error: {response.status_code} - {response.text}")
                 
                 data = response.json()
                 return data["choices"][0]["message"]["content"]
                 
             except httpx.TimeoutException:
-                raise ExternalServiceError("OpenRouter timeout")
+                raise ExternalServiceError("OpenRouter timeout after 60 seconds")
+            except httpx.ConnectError:
+                raise ExternalServiceError("Cannot connect to OpenRouter. Check network/proxy settings")
             except Exception as e:
                 raise ExternalServiceError(f"OpenRouter request failed: {str(e)}")
