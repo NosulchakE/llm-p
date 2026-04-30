@@ -12,7 +12,7 @@
 
 1. Клонирование репозитория
 
-git clone https://github.com/ваш_username/llm-p.git
+git clone https://github.com/NosulchakE/llm-p.git
 cd llm-p
 
 2. Настройка виртуального окружения
