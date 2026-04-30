@@ -17,16 +17,16 @@ async def chat(
     chat_usecase: ChatUseCase = Depends(get_chat_usecase),
 ):
     print("\n" + "="*60)
-    print("🎯 [ROUTE] POST /chat ВЫЗВАН!")
-    print(f"🎯 [ROUTE] user_id={user_id}")
-    print(f"🎯 [ROUTE] prompt={request.prompt}")
-    print(f"🎯 [ROUTE] system={request.system}")
-    print(f"🎯 [ROUTE] max_history={request.max_history}")
-    print(f"🎯 [ROUTE] temperature={request.temperature}")
+    print("[ROUTE] POST /chat ВЫЗВАН!")
+    print(f"[ROUTE] user_id={user_id}")
+    print(f"[ROUTE] prompt={request.prompt}")
+    print(f"[ROUTE] system={request.system}")
+    print(f"[ROUTE] max_history={request.max_history}")
+    print(f"[ROUTE] temperature={request.temperature}")
     print("="*60)
     
     try:
-        print("📞 [ROUTE] Вызов usecase.ask()...")
+        print("[ROUTE] Вызов usecase.ask()...")
         answer = await chat_usecase.ask(
             user_id=user_id,
             prompt=request.prompt,
@@ -34,18 +34,18 @@ async def chat(
             max_history=request.max_history,
             temperature=request.temperature,
         )
-        print(f"✅ [ROUTE] Получен ответ: {answer[:100]}...")
+        print(f"[ROUTE] Получен ответ: {answer[:100]}...")
         return ChatResponse(answer=answer)
         
     except ExternalServiceError as e:
-        print(f"❌ [ROUTE] ExternalServiceError: {e}")
+        print(f"[ROUTE] ExternalServiceError: {e}")
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY, 
             detail=str(e)
         )
         
     except Exception as e:
-        print(f"❌ [ROUTE] Неожиданная ошибка: {type(e).__name__}: {e}")
+        print(f"[ROUTE] Неожиданная ошибка: {type(e).__name__}: {e}")
         traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -59,7 +59,7 @@ async def get_history(
     chat_usecase: ChatUseCase = Depends(get_chat_usecase),
 ):
     """Получение истории диалога"""
-    print(f"📜 [ROUTE] GET /history вызван для user_id={user_id}")
+    print(f"[ROUTE] GET /history вызван для user_id={user_id}")
     messages = await chat_usecase.get_history(user_id)
     return messages
 
@@ -70,7 +70,7 @@ async def clear_history(
     chat_usecase: ChatUseCase = Depends(get_chat_usecase),
 ):
     """Очистка истории диалога"""
-    print(f"🗑️ [ROUTE] DELETE /history вызван для user_id={user_id}")
+    print(f"[ROUTE] DELETE /history вызван для user_id={user_id}")
     await chat_usecase.clear_history(user_id)
 
 
@@ -82,7 +82,7 @@ async def diagnostic(
     import httpx
     from app.core.config import settings
     
-    print(f"🔍 [DIAGNOSTIC] Вызван для user_id={user_id}")
+    print(f"[DIAGNOSTIC] Вызван для user_id={user_id}")
     
     headers = {
         "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
@@ -91,15 +91,15 @@ async def diagnostic(
         "Content-Type": "application/json",
     }
     
-    print(f"🔍 [DIAGNOSTIC] Headers being sent: {headers}")  # ← добавить эту строку
+    print(f"[DIAGNOSTIC] Headers being sent: {headers}")  # доп.диагностика
     
     payload = {
         "model": settings.OPENROUTER_MODEL,
         "messages": [{"role": "user", "content": "Say 'Hello, diagnostic works!'"}],
     }
     
-    print(f"🔍 [DIAGNOSTIC] URL: {settings.OPENROUTER_BASE_URL}/chat/completions")
-    print(f"🔍 [DIAGNOSTIC] Model: {settings.OPENROUTER_MODEL}")
+    print(f"[DIAGNOSTIC] URL: {settings.OPENROUTER_BASE_URL}/chat/completions")
+    print(f"[DIAGNOSTIC] Model: {settings.OPENROUTER_MODEL}")
     
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
@@ -110,7 +110,7 @@ async def diagnostic(
                 follow_redirects=True,
             )
             
-            print(f"🔍 [DIAGNOSTIC] Response status: {response.status_code}")
+            print(f"[DIAGNOSTIC] Response status: {response.status_code}")
             
             return {
                 "status": response.status_code,
@@ -119,7 +119,7 @@ async def diagnostic(
             }
             
         except Exception as e:
-            print(f"❌ [DIAGNOSTIC] Ошибка: {e}")
+            print(f"[DIAGNOSTIC] Ошибка: {e}")
             return {
                 "status": 500,
                 "error": str(e),
