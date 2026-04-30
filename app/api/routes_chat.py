@@ -91,6 +91,8 @@ async def diagnostic(
         "Content-Type": "application/json",
     }
     
+    print(f"🔍 [DIAGNOSTIC] Headers being sent: {headers}")  # ← добавить эту строку
+    
     payload = {
         "model": settings.OPENROUTER_MODEL,
         "messages": [{"role": "user", "content": "Say 'Hello, diagnostic works!'"}],
