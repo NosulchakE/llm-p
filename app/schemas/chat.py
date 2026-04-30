@@ -1,6 +1,7 @@
 # app/schemas/chat.py
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
+from datetime import datetime
 
 
 class ChatRequest(BaseModel):
@@ -18,6 +19,6 @@ class MessageResponse(BaseModel):
     id: int
     role: str
     content: str
-    created_at: str
+    created_at: datetime  # будем считать исправили
     
     model_config = ConfigDict(from_attributes=True)
