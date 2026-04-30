@@ -10,7 +10,6 @@ from app.services.openrouter_client import OpenRouterClient
 from app.usecases.auth import AuthUseCase
 from app.usecases.chat import ChatUseCase
 from app.core.security import decode_token
-from app.core.errors import UnauthorizedError
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 

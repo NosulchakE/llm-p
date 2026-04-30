@@ -12,13 +12,13 @@ class OpenRouterClient:
         self.base_url = settings.OPENROUTER_BASE_URL
         self.api_key = settings.OPENROUTER_API_KEY
         self.model = settings.OPENROUTER_MODEL
-        print(f"[INIT] Client created")
+        print("[INIT] Client created")
         print(f"[INIT] Base URL: {self.base_url}")
         print(f"[INIT] Model: {self.model}")
         print(f"[INIT] API Key (первые 20 символов): {self.api_key[:20] if self.api_key else 'None'}")
     
     async def chat_completion(self, messages: List[Dict[str, str]]) -> str:
-        print(f"\n [CHAT] Начало запроса")
+        print("\n [CHAT] Начало запроса")
         print(f"[CHAT] Получено messages: {messages}")
         
         # Проверка API ключа
@@ -48,7 +48,7 @@ class OpenRouterClient:
         
         async with httpx.AsyncClient(timeout=60.0) as client:
             try:
-                print(f"[CHAT] Отправка POST запроса...")
+                print("[CHAT] Отправка POST запроса...")
                 response = await client.post(
                     url,
                     headers=headers,

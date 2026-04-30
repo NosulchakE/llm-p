@@ -1,5 +1,4 @@
 # app/usecases/chat.py
-from typing import List, Dict
 import traceback
 
 from app.repositories.chat_messages import ChatMessageRepository
@@ -12,7 +11,7 @@ class ChatUseCase:
         self._llm_client = llm_client
     
     async def ask(self, user_id: int, prompt: str, system: str | None, max_history: int, temperature: float) -> str:
-        print(f"\n [USECASE] ask() начал")
+        print("\n [USECASE] ask() начал")
         print(f"[USECASE] user_id={user_id}")
         print(f"[USECASE] prompt={prompt}")
         print(f"[USECASE] system={system}")
@@ -23,10 +22,10 @@ class ChatUseCase:
         
         if system:
             messages.append({"role": "system", "content": system})
-            print(f"[USECASE] Добавлен system message")
+            print("[USECASE] Добавлен system message")
         
         try:
-            print(f"[USECASE] Запрос истории из БД...")
+            print("[USECASE] Запрос истории из БД...")
             history = await self._message_repo.get_last_messages(user_id, max_history)
             print(f"[USECASE] Получено {len(history)} сообщений из истории")
             
@@ -36,19 +35,19 @@ class ChatUseCase:
             messages.append({"role": "user", "content": prompt})
             print(f"[USECASE] Всего messages: {len(messages)}")
             
-            print(f"[USECASE] Сохранение пользовательского сообщения...")
+            print("[USECASE] Сохранение пользовательского сообщения...")
             await self._message_repo.add_message(user_id, "user", prompt)
-            print(f"[USECASE] Сообщение пользователя сохранено")
+            print("[USECASE] Сообщение пользователя сохранено")
             
-            print(f"[USECASE] Вызов LLM клиента...")
+            print("[USECASE] Вызов LLM клиента...")
             answer = await self._llm_client.chat_completion(messages)
             print(f"[USECASE] Получен ответ от LLM: {answer[:100]}...")
             
-            print(f"[USECASE] Сохранение ответа ассистента...")
+            print("[USECASE] Сохранение ответа ассистента...")
             await self._message_repo.add_message(user_id, "assistant", answer)
-            print(f"[USECASE] Ответ ассистента сохранён")
+            print("[USECASE] Ответ ассистента сохранён")
             
-            print(f"[USECASE] ask() успешно завершён")
+            print("[USECASE] ask() успешно завершён")
             return answer
             
         except Exception as e:
@@ -65,4 +64,4 @@ class ChatUseCase:
     async def clear_history(self, user_id: int) -> None:
         print(f"[USECASE] clear_history() вызван для user_id={user_id}")
         await self._message_repo.delete_user_history(user_id)
-        print(f"[USECASE] История очищена")
+        print("[USECASE] История очищена")
